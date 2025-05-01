@@ -9,6 +9,10 @@
 <body>
   <div class="container mt-5">
     <h1>Chỉnh Sửa Bài Kiểm Tra</h1>
+    
+    <!-- Nút trở về trang Admin -->
+    <a href="admin.html" class="btn btn-secondary mb-4">Quay lại trang quản lý</a>
+
     <form id="edit-exam-form">
       <div class="mb-3">
         <label for="exam-title" class="form-label">Tiêu đề Bài Kiểm Tra</label>
@@ -66,6 +70,10 @@
         
         // Hiển thị các câu hỏi
         displayQuestions(data.questions);
+      })
+      .catch(error => {
+        console.error('Lỗi khi lấy dữ liệu bài kiểm tra:', error);
+        alert('Không thể tải bài kiểm tra.');
       });
 
     // Hiển thị các câu hỏi và lựa chọn (MCQ)
