@@ -68,6 +68,7 @@
         displayQuestions(data.questions);
       });
 
+    // Hiển thị các câu hỏi và lựa chọn (MCQ)
     function displayQuestions(questions) {
       let questionListHtml = '';
       questions.forEach((question, index) => {
@@ -76,6 +77,7 @@
             <div class="card-body">
               <h5 class="card-title">Câu hỏi ${index + 1}</h5>
               <p class="card-text">${question.text}</p>
+              ${generateOptionsForm(index, question.options)}
               <button class="btn btn-danger" onclick="deleteQuestion(${index})">Xóa</button>
             </div>
           </div>
@@ -84,12 +86,36 @@
       document.getElementById('questions-list').innerHTML = questionListHtml;
     }
 
+    // Tạo form chỉnh sửa cho các lựa chọn MCQ
+    function generateOptionsForm(questionIndex, options) {
+      let optionsHtml = '';
+      options.forEach((option, optionIndex) => {
+        optionsHtml += `
+          <div class="mb-2">
+            <input type="text" class="form-control" id="question-${questionIndex}-option-${optionIndex}" value="${option}" placeholder="Lựa chọn ${optionIndex + 1}">
+          </div>
+        `;
+      });
+      return `
+        <div>
+          <h6>Chỉnh sửa các lựa chọn:</h6>
+          ${optionsHtml}
+          <button class="btn btn-secondary" onclick="addOption(${questionIndex})">Thêm lựa chọn</button>
+        </div>
+      `;
+    }
+
     function addQuestion() {
       const questionText = prompt('Nhập câu hỏi mới:');
       if (questionText) {
-        examData.questions.push({ text: questionText, type: 'mcq', options: [] });
+        examData.questions.push({ text: questionText, type: 'mcq', options: [''] });
         displayQuestions(examData.questions);
       }
+    }
+
+    function addOption(questionIndex) {
+      examData.questions[questionIndex].options.push('');
+      displayQuestions(examData.questions);
     }
 
     function deleteQuestion(index) {
@@ -109,6 +135,16 @@
       examData.end_date = document.getElementById('end-date').value;
       examData.time_limit = document.getElementById('time-limit').value;
       examData.tab_guard = document.getElementById('tab-guard').checked;
+
+      // Cập nhật các lựa chọn của mỗi câu hỏi
+      examData.questions.forEach((question, questionIndex) => {
+        const questionOptions = [];
+        for (let i = 0; i < question.options.length; i++) {
+          const optionValue = document.getElementById(`question-${questionIndex}-option-${i}`).value;
+          questionOptions.push(optionValue);
+        }
+        question.options = questionOptions;
+      });
 
       // Lưu lại bài kiểm tra vào file JSON (sử dụng localStorage hoặc API server nếu có)
       alert('Bài kiểm tra đã được cập nhật!');
