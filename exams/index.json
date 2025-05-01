@@ -1,1 +1,12 @@
-
+[
+    {
+      "title": "Bài Kiểm Tra Mẫu 1",
+      "description": "Đây là bài kiểm tra mẫu 1 cho sinh viên làm thử.",
+      "file": "bai1.exm.json"
+    },
+    {
+      "title": "Bài Kiểm Tra Mẫu 2",
+      "description": "Đây là bài kiểm tra mẫu 2 với các câu hỏi trắc nghiệm và tự luận.",
+      "file": "bai2.exm.json"
+    }
+  ]
