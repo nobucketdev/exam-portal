@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chỉnh Sửa Bài Kiểm Tra</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Chỉnh Sửa Bài Kiểm Tra</h1>
+    <form id="edit-exam-form">
+      <div class="mb-3">
+        <label for="exam-title" class="form-label">Tiêu đề Bài Kiểm Tra</label>
+        <input type="text" class="form-control" id="exam-title" required>
+      </div>
+      <div class="mb-3">
+        <label for="exam-description" class="form-label">Mô tả Bài Kiểm Tra</label>
+        <textarea class="form-control" id="exam-description" rows="3"></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="start-date" class="form-label">Ngày mở bài kiểm tra</label>
+        <input type="date" class="form-control" id="start-date">
+      </div>
+      <div class="mb-3">
+        <label for="end-date" class="form-label">Ngày đóng bài kiểm tra</label>
+        <input type="date" class="form-control" id="end-date">
+      </div>
+      <div class="mb-3">
+        <label for="time-limit" class="form-label">Thời gian giới hạn (phút)</label>
+        <input type="number" class="form-control" id="time-limit">
+      </div>
+      <div class="mb-3">
+        <label for="tab-guard" class="form-label">Giám sát chuyển tab</label>
+        <input type="checkbox" class="form-check-input" id="tab-guard">
+      </div>
+      <button type="submit" class="btn btn-success">Lưu Bài Kiểm Tra</button>
+    </form>
+
+    <hr>
+
+    <h3>Các Câu Hỏi</h3>
+    <div id="questions-list"></div>
+
+    <hr>
+
+    <button class="btn btn-primary" onclick="addQuestion()">Thêm Câu Hỏi</button>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileName = urlParams.get('file');
+    let examData = {};
+
+    // Lấy dữ liệu bài kiểm tra
+    fetch(`exams/${fileName}`)
+      .then(res => res.json())
+      .then(data => {
+        examData = data;
+        document.getElementById('exam-title').value = data.title;
+        document.getElementById('exam-description').value = data.description;
+        document.getElementById('start-date').value = data.start_date || '';
+        document.getElementById('end-date').value = data.end_date || '';
+        document.getElementById('time-limit').value = data.time_limit || '';
+        document.getElementById('tab-guard').checked = data.tab_guard || false;
+        
+        // Hiển thị các câu hỏi
+        displayQuestions(data.questions);
+      });
+
+    function displayQuestions(questions) {
+      let questionListHtml = '';
+      questions.forEach((question, index) => {
+        questionListHtml += `
+          <div class="card mb-2" id="question-${index}">
+            <div class="card-body">
+              <h5 class="card-title">Câu hỏi ${index + 1}</h5>
+              <p class="card-text">${question.text}</p>
+              <button class="btn btn-danger" onclick="deleteQuestion(${index})">Xóa</button>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('questions-list').innerHTML = questionListHtml;
+    }
+
+    function addQuestion() {
+      const questionText = prompt('Nhập câu hỏi mới:');
+      if (questionText) {
+        examData.questions.push({ text: questionText, type: 'mcq', options: [] });
+        displayQuestions(examData.questions);
+      }
+    }
+
+    function deleteQuestion(index) {
+      if (confirm('Bạn chắc chắn muốn xóa câu hỏi này?')) {
+        examData.questions.splice(index, 1);
+        displayQuestions(examData.questions);
+      }
+    }
+
+    document.getElementById('edit-exam-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Cập nhật dữ liệu bài kiểm tra
+      examData.title = document.getElementById('exam-title').value;
+      examData.description = document.getElementById('exam-description').value;
+      examData.start_date = document.getElementById('start-date').value;
+      examData.end_date = document.getElementById('end-date').value;
+      examData.time_limit = document.getElementById('time-limit').value;
+      examData.tab_guard = document.getElementById('tab-guard').checked;
+
+      // Lưu lại bài kiểm tra vào file JSON (sử dụng localStorage hoặc API server nếu có)
+      alert('Bài kiểm tra đã được cập nhật!');
+    });
+  </script>
+</body>
+</html>
